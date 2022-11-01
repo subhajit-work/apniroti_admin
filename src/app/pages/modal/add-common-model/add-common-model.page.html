@@ -1,0 +1,350 @@
+<ion-content class="add-modal interest-add-modal">
+    <ion-item class="modal-header">
+        <ion-label>
+           {{heder_title}}
+        </ion-label>
+        <div class="modal-cancel-btn">
+            <a herf="#" (click)="closeModal()"><ion-icon color="dark" ios="ios-close" md="md-close"></ion-icon></a>
+        </div>
+    </ion-item>
+
+    <!-- ================== change password modal ======= -->
+    <ion-grid  *ngIf="this.get_identifier == 'change_password_modal'">
+        <ion-row>
+            <ion-col size="12">
+                <form class="modal"  #addPrincipleReciveModalForm="ngForm" (ngSubmit)="onSubmit(addPrincipleReciveModalForm)" [mustMatch]="['new_password', 'confirm_password']" novalidate>
+                    <div class="modal-body">
+                        <!-- for edit -->
+                        <input type="hidden" name="_method" [(ngModel)]="onEditField">
+                        <!-- Deposit Date -->
+                        <div class="change-password-wrapper">
+                            <div class="change-password-inner">
+                                <ion-row>
+                                    <ion-col size="12">
+                                        <div>
+                                            <ion-label position="floating">Old Password <sup>*</sup> </ion-label>
+                                            <div>
+                                                <ion-input type="password" name="old_password" [(ngModel)]="model.old_password" clearInput required>
+                                                </ion-input>
+                                            </div>
+                                        </div>
+                                    </ion-col>
+                                </ion-row>
+                                <ion-row>
+                                    <ion-col size="12">
+                                        <div>
+                                            <ion-label position="floating">New Password <sup>*</sup> </ion-label>
+                                            <div>
+                                                <ion-input 
+                                                type="password" 
+                                                name="new_password" 
+                                                [(ngModel)]="model.new_password" 
+                                                #password="ngModel"
+                                                clearInput required>
+                                                </ion-input>
+                                            </div>
+                                        </div>
+                                    </ion-col>
+                                </ion-row>
+                                <ion-row>
+                                    <ion-col size="12">
+                                        <div>
+                                            <ion-label position="floating">Confirm Password <sup>*</sup> </ion-label>
+                                            <div>
+                                                <ion-input 
+                                                type="password" 
+                                                name="confirm_password" 
+                                                [(ngModel)]="model.confirm_password" clearInput
+                                                #confirmPassword="ngModel"
+                                                required>
+                                                </ion-input>
+                                                <!-- [ngClass]="{ 'is-invalid': confirmPassword.invalid}" -->
+                                            </div>
+                                        </div>
+                                    </ion-col>
+                                </ion-row>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- submit button -->
+                    <ion-row>
+                        <ion-col class="ion-text-center modal-submit modal-footer" size-xs="12" size-sm="12" size-md="12"  size-lg="12" >
+                            <ion-button color="secondary" size="default"
+                            type="submit" [disabled]="!addPrincipleReciveModalForm.valid" 
+                            color="secondary" tooltip="Save" flow="up">
+                                <ion-spinner *ngIf="form_submit_text == 'Submitting'" name="crescent"></ion-spinner> 
+                                <span class="submitText">{{form_submit_text}}</span>
+                            </ion-button>
+                            <ion-button (click)="closeModal()" size="default" fill="clear" color="danger">
+                                <ion-icon name="close"></ion-icon>
+                                Cancel
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                </form>
+                
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <!-- ==================== profile update modal ======= -->
+    <ion-grid  *ngIf="this.get_identifier == 'profile_update_modal'">
+        <ion-row>
+            <ion-col size="12">
+                <form class="modal"  #addPrincipleReciveModalForm="ngForm" (ngSubmit)="onSubmit(addPrincipleReciveModalForm)" >
+                    <div class="modal-body">
+                        <!-- for edit -->
+                        <input type="hidden" name="_method" [(ngModel)]="onEditField">
+                        
+                        <ion-row *ngIf="profileLoading">
+                            <!-- loading -->
+                            <ion-col size-xs="12" >
+                                <div class="profile-loading"> 
+                                    <ion-spinner name="crescent"></ion-spinner>
+                                </div>
+                            </ion-col>
+                        </ion-row>
+
+                        <ion-row *ngIf="!profileLoading">
+                            <!-- Name -->
+                            <ion-col size-xs="12" size-sm="6" >
+                                <div class="update-profile">
+                                    <div class="update-profile-image">
+                                        <img *ngIf="!get_item?.profile" class="img-scale" src="assets/images/noimage.jpg" />
+
+                                        <img *ngIf="get_item?.profile" class="img-scale" src="{{file_url}}/{{get_item.profile}}" />                 <span class="username">
+                                            {{get_item?.full_name}} {{get_item?.name}} 
+                                        </span>
+                                    </div>
+                                </div>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="6" >
+                                <div class="update-profile client">
+                                    <div class="update-profile-client" *ngIf="allClient?.length > 0">
+                                        <b>Client : </b>
+                                        <span *ngFor="let item of allClient; let islast = last;">{{item.name}} <i *ngIf="!islast">,</i></span>
+                                    </div>
+                                    <div class="user_id">
+                                        <b>Email / User Name : </b> {{ model.username }}
+                                    </div>
+                                </div>
+                            </ion-col>
+                        </ion-row>
+
+                        <ion-row>
+                            <!-- Address -->
+                            <ion-col size-xs="12" size-sm="6" size-md="6"  size-lg="4">
+                                <div>
+                                    <ion-label position="floating">Address <sup>*</sup> </ion-label>
+                                    <ion-input name="address" [(ngModel)]="model.address_1" clearInput required></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- Phone -->
+                            <ion-col size-xs="12" size-sm="6" size-md="6"  size-lg="4">
+                                <div>
+                                    <ion-label position="floating">Phone <sup>*</sup> </ion-label>
+                                    <ion-input OnlyNumber="true" type="tel" minlength="10"maxlength="10" name="phone" [(ngModel)]="model.phone" clearInput required></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- Communication Email -->
+                            <ion-col size-xs="12" size-sm="6" size-md="6"  size-lg="4">
+                                <div>
+                                    <ion-label position="floating">Communication Email <sup>*</sup> </ion-label>
+                                    <ion-input type="email" name="communication_email" [(ngModel)]="model.communication_email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" clearInput email required></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- Password -->
+                            <ion-col size-xs="12" size-sm="6" size-md="6"  size-lg="4">
+                                <div>
+                                    <ion-label position="floating">Password <sup>*</sup> </ion-label>
+                                    <div>
+                                        <ion-input type="password" name="password" [(ngModel)]="model.password" clearInput required>
+                                        </ion-input>
+                                    </div>
+                                </div>
+                            </ion-col>
+
+                        </ion-row>
+
+                    </div>
+                    <!-- submit button -->
+                    <ion-row>
+                        <ion-col class="ion-text-center modal-submit modal-footer" size-xs="12" size-sm="12" size-md="12"  size-lg="12" >
+                            <ion-button color="secondary" size="default"
+                            type="submit" [disabled]="!addPrincipleReciveModalForm.valid" 
+                            color="secondary" tooltip="Save" flow="up">
+                                <ion-spinner *ngIf="form_submit_text == 'Submitting'" name="crescent"></ion-spinner> 
+                                <span class="submitText">{{form_submit_text}}</span>
+                            </ion-button>
+                            <ion-button (click)="closeModal()" size="default" fill="clear" color="danger">
+                                <ion-icon name="close"></ion-icon>
+                                Cancel
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                </form>
+                
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <!-- ================== file_preview ================== -->
+    <ion-grid  *ngIf="this.get_identifier == 'file_preview'">
+        <ion-row>
+            <ion-col size="12" style="margin-top: 55px;">
+                <!-- {{get_item.file_path}} -->
+                <!-- <img *ngIf="get_item.file_extension == 'png' || get_item.file_extension == 'jpeg' || get_item.file_extension == 'jpg' || get_item.file_extension == 'gif'" src="{{main_url}}/{{get_item.file_path}}" /> -->
+                <div class="preview-wrapper">
+                    <div class="preview-inner">
+                        <embed [src]="previewOtherUrl | mySafe " />
+                    </div>
+                </div>
+                
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <!-- ================== category modal ======= -->
+    <ion-grid  *ngIf="this.get_identifier == 'category'">
+        <ion-row>
+            <ion-col size="12">
+                <form class="modal"  #addPrincipleReciveModalForm="ngForm" (ngSubmit)="onSubmit(addPrincipleReciveModalForm)" [mustMatch]="['new_password', 'confirm_password']" novalidate>
+                    <div class="modal-body">
+                        <!-- for edit -->
+                        <input type="hidden" name="_method" [(ngModel)]="onEditField">
+                        <input type="hidden" name="identifier" [(ngModel)]="onHiddenFieldIdentifire">
+                        <input type="hidden" name="status" [(ngModel)]="onHiddenFieldStatus">
+                        <div >
+                            <div >
+                                <ion-row>
+                                    <!-- Name -->
+                                    <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                        <div>
+                                            <ion-label position="floating">Name<sup>*</sup></ion-label>
+                                            <ion-input name="name" [(ngModel)]="model.name" (ngModelChange)="getSeoName(model.name)" clearInput required></ion-input>
+                                        </div>
+                                    </ion-col>
+         
+                                    <!-- SEO -->
+                                    <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                        <div>
+                                            <ion-label position="floating">SEO<sup>*</sup></ion-label>
+                                            <ion-input name="seo" [(ngModel)]="model.seo" clearInput required></ion-input>
+                                        </div>
+                                    </ion-col>
+        
+                                    <!-- parent_id -->
+                                    <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                        <div>
+                                            <ion-label position="floating">Parent</ion-label>
+                                            <ng-select  #parentSerch
+                                            [loading]="selectLoading"
+                                            [dropdownPosition]="'bottom'"
+                                            placeholder="Please Select Parent"
+                                            [items]="parentList"
+                                            bindLabel="name"
+                                            name="parent_id"
+                                            bindValue="id"
+                                            [searchable]="false"
+                                            [(ngModel)]="model.parent_id"
+                                            >
+                                            <ng-template ng-header-tmp>
+                                                <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="parentSerch.filter($event.target.value)" [autofocus]="true" />
+                                            </ng-template>
+                                            </ng-select>
+                                        </div>
+                                    </ion-col>
+                                    
+                                    <!-- description -->
+                                    <ion-col size-xs="12" >
+                                        <div>
+                                            <ion-label position="floating">Description </ion-label>
+                                            <ion-textarea  name="description" [(ngModel)]="model.description" clearInput ></ion-textarea>
+                                        </div>
+                                    </ion-col>
+                                    
+                                </ion-row>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- submit button -->
+                    <ion-row>
+                        <ion-col class="ion-text-center modal-submit modal-footer" size-xs="12" size-sm="12" size-md="12"  size-lg="12" >
+                            <ion-button color="secondary" size="default"
+                            type="submit" [disabled]="!addPrincipleReciveModalForm.valid" 
+                            color="secondary" tooltip="Save" flow="up">
+                                <ion-spinner *ngIf="form_submit_text == 'Submitting'" name="crescent"></ion-spinner> 
+                                <span class="submitText">{{form_submit_text}}</span>
+                            </ion-button>
+                            <ion-button (click)="closeModal()" size="default" fill="clear" color="danger">
+                                <ion-icon name="close"></ion-icon>
+                                Cancel
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                </form>
+                
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+    <!-- category modal end -->
+
+    <!-- ==== upload csv file form start ==== -->
+    <ion-grid *ngIf="this.get_identifier == 'csv_upload' || this.get_identifier == 'student_csv_upload'">
+        <form class="modal"  #addModalForm="ngForm" (ngSubmit)="onSubmit(addModalForm)" >
+            <div class="modal-body">
+                <!-- for edit -->
+                <input type="hidden" name="_method" [(ngModel)]="onEditField">
+                <!-- file upoload -->
+                <ion-row class="file-upload">
+                    <ion-col size-xs="12" size-sm="12" size-md="12"  size-lg="12">
+                        <!-- <div class="file-uploading" (click)="fileInput.click();" >
+                            <div>
+                                <input hidden type="file" #fileInput>
+                            </div>
+                        </div> -->
+                        <div class="upload-question">
+                            <div class="normal-file-uploading">
+                                <span class="file-uploading click-upload">
+                                    <input [(ngModel)]="model.image2" type="file" (change)="normalFileUpload($event)" placeholder="Upload file" name="csvFile" [ngModelOptions]="{standalone: true}" accept=".csv" >
+                                </span>
+                                <!-- accept=".pdf,.jpg,.doc,.docx" -->
+                                <!-- accept="image/*" -->
+                                <div class="show-name">
+                                    <span [hidden]="!model.csvFile" class="file-name">{{model.csvFile}}</span>
+                                    <span class="image-clear" (click)="fileCross()" [hidden]="!model.csvFile">
+                                        <ion-icon name="close"></ion-icon>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </ion-col>
+                </ion-row>
+                <!-- upload file show start -->
+
+            </div>
+            <!-- submit button -->
+            <ion-row>
+                <ion-col class="ion-text-center modal-submit modal-footer" size-xs="12" size-sm="12" size-md="12"  size-lg="12" >
+                    <ion-button color="secondary" size="default"
+                    type="submit" [disabled]="!model.image2" 
+                    color="secondary" tooltip="Save" flow="up">
+                        <ion-spinner *ngIf="form_submit_text == 'Submitting'" name="crescent"></ion-spinner> 
+                        <span class="submitText">{{form_submit_text}}</span>
+                    </ion-button>
+                    <ion-button (click)="closeModal()" size="default" fill="clear" color="danger">
+                        <ion-icon name="close"></ion-icon>
+                        Cancel
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+        </form>
+    </ion-grid>
+    <!-- upload csv file form end -->
+    
+</ion-content>

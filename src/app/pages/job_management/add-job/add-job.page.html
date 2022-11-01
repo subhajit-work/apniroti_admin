@@ -1,0 +1,474 @@
+
+<!-- common header show -->
+<common-header></common-header>
+ 
+<ion-content class="page-wrapper">
+    <div class="page-inner">
+        <ion-row class="width-100 sub-header nomargin nopadding">
+            <ion-col size-xs="7" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color pull-left width-100 font-size-18 vertical-middle">
+                    <span>{{actionHeaderText}} Job</span>
+                </div>
+            </ion-col>
+            <ion-col size-xs="5" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color width-100 text-right">
+                <span class="font-size-13"> {{curentDate | date:'dd MMM yyy'}} <i>|</i> {{curentDate | date:'h:mm a '}}</span>
+                </div>
+            </ion-col>
+        </ion-row> 
+        <div class="add-new-page-body" [ngClass]="{'disabled': form_submit_text == 'Submitting'}">
+
+            <!-- loading -->
+            <div class="edit-loading-page" *ngIf="editLoading">
+                <span>
+                    <ion-spinner name="lines"></ion-spinner>
+                </span>
+            </div>
+
+            <form  #addForm="ngForm" (ngSubmit)="onSubmit(addForm)" >
+                <div class="add-new-page-underpart">
+                    <ion-grid>
+                        <ion-row>
+
+                            <!-- for edit -->
+                            <input *ngIf="actionHeaderText == 'Edit'" type="hidden" name="_method" [(ngModel)]="onEditField">
+
+                            <!-- Name -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Name<sup>*</sup></ion-label>
+                                  <ion-input name="name" [(ngModel)]="model.name" clearInput required></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- Company -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Corporate Partner<sup>*</sup></ion-label>
+                                  <ng-select  #companyNameSerch
+                                  [loading]="selectLoading"
+                                  [dropdownPosition]="'bottom'"
+                                  placeholder="Please Select Corporate Partner"
+                                  [items]="companyList"
+                                  bindLabel="name"
+                                  name="company_id"
+                                  bindValue="id"
+                                  [searchable]="false"
+                                  [(ngModel)]="model.company_id"
+                                  (change)="onChangeCompany(model.company_id)"
+                                  required
+                                  >
+                                  <ng-template ng-header-tmp>
+                                      <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="companyNameSerch.filter($event.target.value)" [autofocus]="true" />
+                                  </ng-template>
+                                  </ng-select>
+                              </div>
+                            </ion-col>
+
+                            <!-- City -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">City<sup>*</sup></ion-label>
+                                  <ng-select  #cityNameSerch
+                                  [loading]="selectLoading"
+                                  [dropdownPosition]="'bottom'"
+                                  placeholder="Please Select City"
+                                  [items]="cityList"
+                                  bindLabel="name"
+                                  name="city"
+                                  bindValue="id"
+                                  [searchable]="false"
+                                  [(ngModel)]="model.city"
+                                  [multiple]="true"
+                                  required
+                                  >
+                                  <ng-template ng-header-tmp>
+                                      <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="cityNameSerch.filter($event.target.value)" [autofocus]="true" />
+                                  </ng-template>
+                                  </ng-select>
+                              </div>
+                            </ion-col>
+
+                            <!-- position -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Position<sup>*</sup></ion-label>
+                                  <ion-input OnlyNumber="true" name="position" [(ngModel)]="model.position" placeholder="Please Put No of Vacancy" clearInput required></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- Job Type -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Job Type<sup>*</sup></ion-label>
+                                  <ng-select  #jobTypeSerch
+                                  [loading]="selectLoading"
+                                  [dropdownPosition]="'bottom'"
+                                  placeholder="Please Select Job Type"
+                                  [items]="jobTypeList"
+                                  bindLabel="name"
+                                  name="job_type_id"
+                                  bindValue="id"
+                                  [searchable]="false"
+                                  [(ngModel)]="model.job_type_id"
+                                  (change)="onChangeJobType(model.job_type_id)"
+                                  required
+                                  >
+                                  <ng-template ng-header-tmp>
+                                      <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="jobTypeSerch.filter($event.target.value)" [autofocus]="true" />
+                                  </ng-template>
+                                  </ng-select>
+                              </div>
+                            </ion-col>
+
+                            <!-- Date -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4" [ngClass]="{'show-disable':model.job_type_id != 9}">
+                              <div>
+                                <ion-label position="floating">Date Time</ion-label>
+
+                                <!-- <li-ionic4-datepicker 
+                                name="date_time" 
+                                [(ngModel)]="model.date_time"
+                                [inputDateConfig]="startdatePickerObj" 
+                                (ngModelChange)="onChangeDateTime(model.date_time)"
+                                [ngModelOptions]="{standalone: true}"
+                                >
+                                </li-ionic4-datepicker> -->
+
+                                <div class="date-time-picker-wrapper">
+                                  <input placeholder="Choose Job Type as Walk-In" [(ngModel)]="model.date_time" name="date_time"
+                                    [owlDateTimeTrigger]="dt11" [owlDateTime]="dt11"
+                                    #dateTime="ngModel" (ngModelChange)="dateTimePickerChange(model.date_time)" [ngModelOptions]="{standalone: true}">
+                                  <span class="close" [hidden]="!model.date_time" (click)="crossDateTime(model.date_time, dateTimeFormatChangeValue)">
+                                    <ion-icon name="close-circle"></ion-icon>
+                                  </span>
+                                  <span class="trigger" [owlDateTimeTrigger]="dt11">
+                                    <ion-icon name="calendar"></ion-icon>
+                                  </span>
+                                  <owl-date-time [pickerMode]="'dialog'" #dt11></owl-date-time>
+
+                                  <!-- hidden -->
+                                  <input type="hidden" [(ngModel)]="dateTimeFormatChangeValue" name="date_time">
+                                </div>
+
+                              </div>
+
+                               <!-- Time -->
+                               <!-- <div style="padding-left: 5px;">
+                                <ion-label position="floating">Time</ion-label>
+                                <li-ionic-timepicker 
+                                name="date_time_tt" 
+                                [(ngModel)]="model.only_time"
+                                [inputTimeConfig]="timePickerObj" 
+                                (ngModelChange)="onChangeDateTime(model.only_time)"
+                                [ngModelOptions]="{standalone: true}"
+                                >
+                                </li-ionic-timepicker>
+
+                              </div> -->
+
+                            </ion-col>
+
+                            <!-- salary_min -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4" class="salary-inner">
+                              <div>
+                                <ion-label position="floating">Salary</ion-label>
+                                <ion-input  OnlyNumber="true" name="salary_min" [(ngModel)]="model.salary_min" placeholder="Enter Minimum Salary" clearInput></ion-input>
+                              </div>
+                            <span class="range-text">
+                              to
+                            </span>
+                            </ion-col>
+                            <!-- salary_max -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4" class="salary-inner">
+                              <div>
+                                <ion-label position="floating" style="opacity: 0;">Salary</ion-label>
+                                <ion-input OnlyNumber="true" name="salary_max" [(ngModel)]="model.salary_max" placeholder="Enter Maximum Salary" clearInput></ion-input>
+                              </div>
+
+                            <span class="range-text">
+                              /
+                            </span>
+                            </ion-col>
+                            <!-- salary_type -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating" >Salary Type</ion-label>
+                                  <ng-select  #salaryTypeSerch
+                                  [loading]="selectLoading"
+                                  [dropdownPosition]="'bottom'"
+                                  placeholder="Please Select Salary Type"
+                                  [items]="salaryTypeList"
+                                  bindLabel="name"
+                                  name="salary_type"
+                                  bindValue="id"
+                                  [searchable]="false"
+                                  [(ngModel)]="model.salary_type"
+                                  >
+                                  <ng-template ng-header-tmp>
+                                      <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="salaryTypeSerch.filter($event.target.value)" [autofocus]="true" />
+                                  </ng-template>
+                                  </ng-select>
+                              </div>
+                            </ion-col>
+
+                            <!-- notice_period -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Notice Period (in days)</ion-label>
+                                  <ion-input name="notice_period" [(ngModel)]="model.notice_period" clearInput ></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- industry_type_id -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Sector<sup>*</sup></ion-label>
+                                  <ng-select  #industryTypeSerch
+                                  [loading]="selectLoading"
+                                  [dropdownPosition]="'bottom'"
+                                  placeholder="Please Select Sector"
+                                  [items]="industryTypeList"
+                                  bindLabel="name"
+                                  name="industry_type_id"
+                                  bindValue="id"
+                                  [searchable]="false"
+                                  [(ngModel)]="model.industry_type_id"
+                                  required
+                                  >
+                                  <ng-template ng-header-tmp>
+                                      <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="industryTypeSerch.filter($event.target.value)" [autofocus]="true" />
+                                  </ng-template>
+                                  </ng-select>
+                              </div>
+                            </ion-col>
+
+                            <!--Email -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Email</ion-label>
+                                  <ion-input type="email" name="email" [(ngModel)]="model.email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" clearInput  email></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- Phone -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                  <ion-label position="floating">Phone </ion-label>
+                                  <ion-input OnlyNumber="true" type="tel" minlength="10"maxlength="10" name="phone" [(ngModel)]="model.phone" clearInput  ></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- Date -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                <ion-label position="floating">Expiry Date</ion-label>
+
+                                <li-ionic4-datepicker 
+                                name="expiry_date" 
+                                [(ngModel)]="model.expiry_date"
+                                [inputDateConfig]="startdatePickerObj" 
+                                >
+                                </li-ionic4-datepicker>
+                              </div>
+                            </ion-col>
+
+                            <!-- Education -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <ion-label position="floating"> Education<sup>*</sup> </ion-label>
+                              <ng-select #QualificationSerch
+                                  [loading]="selectLoading"
+                                  [dropdownPosition]="'bottom'"
+                                  placeholder="Please Select Education"
+                                  [items]="qualificationList"
+                                  bindLabel="name"
+                                  name="qualification"
+                                  bindValue="id"
+                                  [searchable]="false"
+                                  [(ngModel)]="model.qualification"
+                                  (change)="onChangeStudy(model.qualification, 'degree', '')"
+                                  [multiple]="true"
+                                  required
+                                  >
+                                  <ng-template ng-header-tmp>
+                                      <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="QualificationSerch.filter($event.target.value)" [autofocus]="true" />
+                                  </ng-template>
+                              </ng-select>
+                            </ion-col>
+
+                            <!-- Degree -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                <ion-label position="floating"> Degree</ion-label>
+                                <ng-select #degreeSearch
+                                    [loading]="selectLoadingDepend"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select Degree"
+                                    [items]="degreeList"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [searchable]="false"
+                                    name="qual_degree" 
+                                    [(ngModel)]="model.qual_degree"
+                                    (change)="onChangeStudy(model.qual_degree, 'interest', '')"
+                                    appendTo="body"
+                                    [multiple]="true"
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="degreeSearch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                </ng-select>
+                            </ion-col>
+
+                            <!-- Area of Interest -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                <ion-label position="floating"> Area of Interest </ion-label>
+                                <ng-select #interestSearch
+                                    [loading]="selectLoadingDepend"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select Area of Interest"
+                                    [items]="interestList"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [searchable]="false"
+                                    name="qual_interest" 
+                                    [(ngModel)]="model.qual_interest" 
+                                    (change)="onChange(model.qual_interest)"
+                                    appendTo="body"
+                                    [multiple]="true"
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="interestSearch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                </ng-select>
+                            </ion-col>
+
+                            <!-- Subject -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                <ion-label position="floating"> Subject<sup>*</sup></ion-label>
+                                <ng-select #subjectSearch
+                                    [loading]="selectLoading"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select Subject"
+                                    [items]="subjectList"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [searchable]="false"
+                                    name="qual_subject" 
+                                    [(ngModel)]="model.qual_subject " 
+                                    appendTo="body"
+                                    [multiple]="true"
+                                    required
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="subjectSearch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                </ng-select>
+                            </ion-col>
+
+                            <!-- Experience -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                <ion-label position="floating">Experience</ion-label>
+                                <ion-input name="exp_qualification" [(ngModel)]="model.exp_qualification" clearInput ></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- External Link -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                              <div>
+                                <ion-label position="floating">External Link</ion-label>
+                                <ion-input name="link" [(ngModel)]="model.link" clearInput ></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- Show Company Details -->
+                            <ion-col size-xs="12" size-sm="6" size-md="2"  size-lg="4">
+                              <div class="toggle-button">
+                                  <ion-label>Show Skilling Partner Details</ion-label>
+                                  <ion-label>
+                                      <p class="onoff"><input type="checkbox" value="1" id="companyDetailscheckboxID" name="show_company_details" [(ngModel)]="model.show_company_details"><label for="companyDetailscheckboxID"></label></p>
+                                  </ion-label>
+                              </div>
+                            </ion-col>
+
+                            <!-- benefit -->
+                            <ion-col size-xs="12" size-sm="8" >
+                              <div>
+                                  <ion-label position="floating">Benefit </ion-label>
+                                  <ion-textarea  name="benefit" [(ngModel)]="model.benefit" clearInput ></ion-textarea>
+                              </div>
+                            </ion-col>
+
+                            <!-- Enable Button -->
+                            <ion-col size-xs="12" size-sm="2" size-md="2"  size-lg="2">
+                              <div class="toggle-button">
+                                  <ion-label>Enable</ion-label>
+                                  <ion-label>
+                                      <p class="onoff"><input type="checkbox" value="1" id="checkboxID" name="status" [(ngModel)]="model.enable"><label for="checkboxID"></label></p>
+                                  </ion-label>
+                              </div>
+                            </ion-col>
+
+                            <!-- responsibility -->
+                            <ion-col size-xs="12" size-sm="6">
+                              <div>
+                                  <ion-label position="floating">Responsibility <sup>*</sup> </ion-label>
+                                  <ion-textarea  name="responsibility" [(ngModel)]="model.responsibility" clearInput required></ion-textarea>
+                              </div>
+                            </ion-col>
+
+                            <!-- skill -->
+                            <ion-col size-xs="12" size-sm="6" >
+                              <div>
+                                  <ion-label position="floating">Skill <sup>*</sup> </ion-label>
+                                  <ion-textarea name="skill" [(ngModel)]="model.skill" clearInput required></ion-textarea>
+                              </div>
+                            </ion-col>
+
+                            <!-- summary -->
+                            <ion-col size-xs="12" size-sm="12" >
+                              <div>
+                                  <ion-label position="floating">Summary <sup>*</sup> </ion-label>
+                                  <ion-textarea name="summary" [(ngModel)]="model.summary" clearInput required></ion-textarea>
+                              </div>
+                            </ion-col>
+                            
+                        </ion-row>
+                    </ion-grid>
+                </div>
+                <div class="form-button-section">
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col class="ion-text-center" size-xs="12" size-sm="12" size-md="12"  size-lg="12">
+                                <ion-button color="danger" size="default" tooltip="Reload" (click)="reloadPageAlert()">
+                                    Reload
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save')" color="secondary" size="default"
+                                type="submit" [disabled]="!addForm.valid" 
+                                color="secondary" tooltip="Save" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">{{form_submit_text_save}}</span>
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save-add-another')" color="secondary" size="default"
+                                    type="submit" [disabled]="!addForm.valid" 
+                                    color="secondary" tooltip="Save & Add Another" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save_another == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">
+                                        <span class="submitText">{{form_submit_text_save_another}}</span>
+                                    </span>
+                                </ion-button>
+                                <ion-button size="default" fill="clear" color="danger" tooltip="Cancel" flow="up" [routerLink]="['/', 'job']">
+                                    <ion-icon name="close"></ion-icon>
+                                    Cancel
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </div>
+            </form>
+        </div>
+    </div>
+</ion-content>
+
+<!-- common footer show -->
+<common-footer></common-footer>

@@ -1,0 +1,160 @@
+<!-- common header show -->
+<common-header></common-header>
+ 
+<ion-content class="page-wrapper">
+    <div class="page-inner">
+        <ion-row class="width-100 sub-header nomargin nopadding">
+            <ion-col size-xs="7" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color pull-left width-100 font-size-18 vertical-middle">
+                    <span>{{actionHeaderText}} Question</span>
+                </div>
+            </ion-col>
+            <ion-col size-xs="5" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color width-100 text-right">
+                <span class="font-size-13"> {{curentDate | date:'dd MMM yyy'}} <i>|</i> {{curentDate | date:'h:mm a '}}</span>
+                </div>
+            </ion-col>
+        </ion-row> 
+        <div class="add-new-page-body" [ngClass]="{'disabled': form_submit_text == 'Submitting'}">
+
+            <!-- loading -->
+            <div class="edit-loading-page" *ngIf="editLoading">
+                <span>
+                    <ion-spinner name="lines"></ion-spinner>
+                </span>
+            </div>
+
+            <form  #addForm="ngForm" (ngSubmit)="onSubmit(addForm)" >
+                <div class="add-new-page-underpart">
+                    <ion-grid>
+                        <ion-row>
+
+                            <!-- for edit -->
+                            <input *ngIf="actionHeaderText == 'Edit'" type="hidden" name="_method" [(ngModel)]="onEditField">
+
+                            <!-- subject -->
+                            <ion-col size-xs="12" size-sm="4" size-md="4"  size-lg="4">
+                                <div>
+                                    <ion-label position="floating">Question Set<sup>*</sup></ion-label>
+                                    <ng-select  #subjectSerch
+                                    [loading]="selectLoading"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select Subject"
+                                    [items]="subjectList"
+                                    bindLabel="name"
+                                    name="subject_id"
+                                    bindValue="id"
+                                    [searchable]="false"
+                                    [(ngModel)]="model.subject_id"
+                                    required
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="subjectSerch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                    </ng-select>
+                                </div>
+                            </ion-col>
+                            
+                            <!-- Question -->
+                            <ion-col size-xs="11" >
+                                <div>
+                                    <ion-label position="floating">Question<sup>*</sup></ion-label>
+                                    <!-- <ion-input name="name" [(ngModel)]="model.name"  clearInput required></ion-input> -->
+                                    <ion-textarea auto-grow="true" name="name" [(ngModel)]="model.name" clearInput></ion-textarea>
+                                </div>
+                            </ion-col>
+
+                            <!-- option -->
+                            <ion-col size-xs="11">
+                                <div *ngFor="let item of model.pages; let i = index;  let first = first; let last = last;"> 
+                                    <ion-label position="floating">Option {{i+1}} <sup>*</sup></ion-label>
+                                    <div class="same-line-addRemove">
+                                        <!-- minus Button -->
+                                        <div class="button-add-remove">
+                                            <div class="add-address-btn remove" [hidden]="first || (i+1 == 2)">
+                                                <ion-button color="danger" size="small" (click)="removeItem(i, $event, model.pages, '', '');">
+                                                    <ion-ripple-effect></ion-ripple-effect>
+                                                    <ion-icon ios="ios-remove" md="md-remove"></ion-icon>
+                                                </ion-button>
+                                            </div>
+                                        </div>
+                                        <!-- Plus Button -->
+                                        <div class="button-add-remove" *ngIf="i+1 == 2">
+                                            <div class="add-address-btn">
+                                                <ion-button color="warning" size="small" (click)="addItem(model.pages, item)">
+                                                    <!-- <ion-ripple-effect></ion-ripple-effect> -->
+                                                    <ion-icon ios="ios-add" md="md-add"></ion-icon>
+                                                </ion-button>
+                                            </div>
+                                        </div>
+                                        <!-- <ion-input name="option[{{i}}][name]" [(ngModel)]="item.name"  clearInput required></ion-input> -->
+                                        <ion-textarea auto-grow="true" name="option[{{i}}][name]" [(ngModel)]="item.name" [required]="'first || (i+1 == 2)'"  clearInput></ion-textarea>
+                                    </div>
+                                </div>
+                            </ion-col>
+
+                            <!-- Correct Option -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                <div>
+                                    <ion-label position="floating">Answer<sup>*</sup></ion-label>
+                                    <ion-input placeholder="Put Option No.(e.g. 1)" name="correct_option" [(ngModel)]="model.correct_option"  clearInput required></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- Enable Button -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div class="toggle-button">
+                                    <ion-label>Enable</ion-label>
+                                    <ion-label>
+                                        <p class="onoff"><input type="checkbox" value="1" id="checkboxID" name="status" [(ngModel)]="model.enable"><label for="checkboxID"></label></p>
+                                    </ion-label>
+                                </div>
+                            </ion-col>
+
+                            <!-- description -->
+                            <!-- <ion-col size-xs="12" >
+                                <div>
+                                    <ion-label position="floating">Description </ion-label>
+                                    <ion-textarea  name="description" [(ngModel)]="model.description" clearInput ></ion-textarea>
+                                </div>
+                            </ion-col> -->
+                            
+                        </ion-row>
+                    </ion-grid>
+                </div>
+                <div class="form-button-section">
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col class="ion-text-center" size-xs="12" size-sm="12" size-md="12"  size-lg="12">
+                                <ion-button color="danger" size="default" tooltip="Reload" (click)="reloadPageAlert()">
+                                    Reload
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save')" color="secondary" size="default"
+                                type="submit" [disabled]="!addForm.valid" 
+                                color="secondary" tooltip="Save" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">{{form_submit_text_save}}</span>
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save-add-another')" color="secondary" size="default"
+                                    type="submit" [disabled]="!addForm.valid" 
+                                    color="secondary" tooltip="Save & Add Another" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save_another == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">
+                                        <span class="submitText">{{form_submit_text_save_another}}</span>
+                                    </span>
+                                </ion-button>
+                                <ion-button size="default" fill="clear" color="danger" tooltip="Cancel" flow="up" [routerLink]="['/', 'question']">
+                                    <ion-icon name="close"></ion-icon>
+                                    Cancel
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </div>
+            </form>
+        </div>
+    </div>
+</ion-content>
+
+<!-- common footer show -->
+<common-footer></common-footer>

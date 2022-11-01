@@ -1,0 +1,381 @@
+<!-- common header show -->
+<common-header></common-header>
+
+<ion-content class="page-wrapper">
+    <div class="page-inner">
+        <ion-row class="width-100 sub-header nomargin nopadding">
+            <ion-col size-xs="7" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color pull-left width-100 font-size-18 vertical-middle">
+                    <span>{{actionHeaderText}} Site</span>
+                </div>
+            </ion-col>
+            <ion-col size-xs="5" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color width-100 text-right">
+                <span class="font-size-13"> {{curentDate | date:'dd MMM yyy'}} <i>|</i> {{curentDate | date:'h:mm a '}}</span>
+                </div>
+            </ion-col>
+        </ion-row> 
+        <div class="add-new-page-body" [ngClass]="{'disabled': form_submit_text == 'Submitting'}">
+
+            <!-- loading -->
+            <div class="edit-loading-page" *ngIf="editLoading">
+                <span>
+                    <ion-spinner name="lines"></ion-spinner>
+                </span>
+            </div>
+
+            <form  #addForm="ngForm" (ngSubmit)="onSubmit(addForm)" >
+                <div class="add-new-page-under">
+                    <ion-grid>
+                        <ion-row>
+
+                            <!-- for edit -->
+                            <input *ngIf="actionHeaderText == 'Edit'" type="hidden" name="_method" [(ngModel)]="onEditField">
+
+                            <!--   Name  -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                              <div>
+                                  <ion-label position="floating"> Name<sup>*</sup></ion-label>
+                                  <ion-input name="name" [(ngModel)]="model.name" (ngModelChange)="getSeoName(model.name)"clearInput required></ion-input>
+                              </div>
+                            </ion-col> 
+
+                            <!-- seo -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">SEO<sup>*</sup></ion-label>
+                                    <ion-input name="seo" [(ngModel)]="model.seo" clearInput required></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!--Big logo upload -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">Light Logo (For Big Header)</ion-label>
+                                    <div class="normal-file-uploading">
+                                        <span class="upload-file">
+                                            Upload Logo
+                                            <input [(ngModel)]="model.logo" type="file" (change)="normalFileUpload($event, model.logo, 'logo')" placeholder="Upload file" [ngModelOptions]="{standalone: true}" accept="image/*">
+                                        </span>
+                                        <!-- accept=".pdf,.jpg,.doc,.docx" -->
+                                        <span [hidden]="!model.logo" class="file-name">{{model.logo}}</span>
+                                        <span class="image-clear" (click)="fileCross(model.logo, 'logo')" [hidden]="!model.logo">
+                                            <ion-icon name="close"></ion-icon>
+                                        </span>
+                                    </div>
+                                </div>
+                            </ion-col>
+
+                            <!--Small logo upload -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">Dark Logo (For Small Header)</ion-label>
+                                    <div class="normal-file-uploading">
+                                        <span class="upload-file">
+                                            Upload Logo
+                                            <input [(ngModel)]="model.logo2" type="file" (change)="normalFileUpload($event, model.logo2, 'logo2')" placeholder="Upload file" [ngModelOptions]="{standalone: true}" accept="image/*">
+                                        </span>
+                                        <!-- accept=".pdf,.jpg,.doc,.docx" -->
+                                        <span [hidden]="!model.logo2" class="file-name">{{model.logo2}}</span>
+                                        <span class="image-clear" (click)="fileCross(model.logo2, 'logo2')" [hidden]="!model.logo2">
+                                            <ion-icon name="close"></ion-icon>
+                                        </span>
+                                    </div>
+                                </div>
+                            </ion-col>
+
+                            <!-- favicon upload -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                  <ion-label position="floating">Favicon</ion-label>
+                                  <div class="normal-file-uploading">
+                                    <span class="upload-file">
+                                        Upload
+                                        <input [(ngModel)]="model.favicon" type="file" (change)="normalFileUpload($event, model.favicon, 'favicon')" placeholder="Upload file" [ngModelOptions]="{standalone: true}" accept="image/*">
+                                    </span>
+                                    <!-- accept=".pdf,.jpg,.doc,.docx" -->
+                                    <span [hidden]="!model.favicon" class="file-name">{{model.favicon}}</span>
+                                    <span class="image-clear" (click)="fileCross(model.favicon, 'favicon')" [hidden]="!model.favicon">
+                                        <ion-icon name="close"></ion-icon>
+                                    </span>
+                                  </div>
+                              </div>    
+                            </ion-col>
+
+                            <!--   link  -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating"> Link<sup>*</sup></ion-label>
+                                    <ion-input name="link" [(ngModel)]="model.link" placeholder="Enter site link name" clearInput required></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- Country -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <ion-label position="floating"> Country </ion-label>
+                                <ng-select #countryAddressSerch
+                                    [loading]="selectLoading"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select Country"
+                                    [items]="countryList"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    (change)="onChangeLocation(model.country_id, 'state', model)"
+                                    [searchable]="false"
+                                    name="country_id" 
+                                    [(ngModel)]="model.country_id"
+                                    appendTo="body"
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="countryAddressSerch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                </ng-select>
+                            </ion-col>
+
+                            <!-- state -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <ion-label position="floating"> State </ion-label>
+                                <ng-select #stateAddressSerch
+                                    [loading]="selectLoadingDepend"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select State"
+                                    [items]="stateList"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    (change)="onChangeLocation(model.state_id, 'city', model)"
+                                    [searchable]="false"
+                                    name="state_id" 
+                                    [(ngModel)]="model.state_id" 
+                                    appendTo="body"
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="stateAddressSerch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                </ng-select>
+                            </ion-col>
+
+                            <!-- City -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <ion-label position="floating"> City </ion-label>
+                                <ng-select #cityAddressSerch
+                                    [loading]="selectLoading"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select City"
+                                    [items]="cityList"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    (change)="onChange(model.city_id)"
+                                    [searchable]="false"
+                                    name="city_id" 
+                                    [(ngModel)]="model.city_id" 
+                                    appendTo="body"
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="cityAddressSerch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                </ng-select>
+                            </ion-col>
+
+                            <!-- Pin -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">Pin</ion-label>
+                                    <ion-input OnlyNumber="true" minlength="6" maxlength="6" name="pin" [(ngModel)]="model.pin" clearInput></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- CGST -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">CGST</ion-label>
+                                    <ion-input OnlyNumber="true" name="cgst" [(ngModel)]="model.cgst" clearInput ></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- SGST -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">SGST</ion-label>
+                                    <ion-input OnlyNumber="true" name="sgst" [(ngModel)]="model.sgst" clearInput ></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- IGST -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">IGST</ion-label>
+                                    <ion-input OnlyNumber="true" name="igst" [(ngModel)]="model.igst" clearInput ></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- Email -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">Email</ion-label>
+                                    <ion-input type="email" email name="email" [(ngModel)]="model.email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" clearInput></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- ALT_Email -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">Alt Email</ion-label>
+                                    <ion-input type="email" email name="alt_email" [(ngModel)]="model.alt_email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" clearInput></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- Phone -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">Phone</ion-label>
+                                    <ion-input OnlyNumber="true" type="tel" minlength="10" maxlength="10" name="phone" [(ngModel)]="model.phone" clearInput></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!-- ALT_Phone -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">Alt Phone</ion-label>
+                                    <ion-input OnlyNumber="true" type="tel" minlength="10" maxlength="10" name="alt_phone" [(ngModel)]="model.alt_phone" clearInput></ion-input>
+                                </div>
+                            </ion-col>
+
+                            <!--   Razorpay_key  -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating"> Razorpay Key</ion-label>
+                                    <ion-input name="razorpay_key" [(ngModel)]="model.razorpay_key"clearInput></ion-input>
+                                </div>
+                            </ion-col> 
+
+                            <!-- Enable Button -->
+                            <ion-col size-xs="6" size-sm="4" size-md="4"  size-lg="3">
+                                <div class="toggle-button">
+                                    <ion-label>Enable</ion-label>
+                                    <ion-label>
+                                        <p class="onoff"><input type="checkbox" value="1" id="checkboxID" name="status" [(ngModel)]="model.enable"><label for="checkboxID"></label></p>
+                                    </ion-label>
+                                </div>
+                            </ion-col>
+
+                            <!-- address_1 -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="6">
+                                <div>
+                                    <ion-label position="floating">Address 1</ion-label>
+                                    <ion-textarea auto-grow="true" name="address_1" [(ngModel)]="model.address_1" clearInput></ion-textarea>
+                                </div>
+                            </ion-col>
+
+                            <!-- address_2 -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="6">
+                                <div>
+                                    <ion-label position="floating">Address 2</ion-label>
+                                    <ion-textarea auto-grow="true" name="address_2" [(ngModel)]="model.address_2" clearInput></ion-textarea>
+                                </div>
+                            </ion-col>
+
+                            <!-- ================= multuple social start ========== -->
+                            <ion-col size="12">
+                                <ion-row>
+                                    <div class="detail-information">
+                                        <ion-grid class="detail-information-pdc">
+                                        <ion-row *ngFor="let item of model.social; let i = index;  let first = first; let last = last;  let odd = odd" [ngClass]="{ 'odd-pdc-row': odd}">
+                                            <!--(+ -) button start -->
+                                            <ion-col size-xs="12" size-sm="12" size-md="12"  size-lg="12" class="button-add-remove-wrapper">
+                                                <span class="title">Social {{i + 1}}</span>
+                                                <!-- minus Button -->
+                                                <div class="button-add-remove">
+                                                    <div class="add-address-btn remove" [hidden]="first">
+                                                        <ion-button color="danger" size="small" (click)="removeItem(i, $event, model.social, '', '');">
+                                                            <ion-ripple-effect></ion-ripple-effect>
+                                                            <ion-icon ios="ios-remove" md="md-remove"></ion-icon>
+                                                        </ion-button>
+                                                    </div>
+                                                </div>
+                                                <!-- Plus Button -->
+                                                <div class="button-add-remove" *ngIf="first || last">
+                                                    <div class="add-address-btn">
+                                                        <ion-button color="warning" size="small" (click)="addItem(model.social, item)">
+                                                            <!-- <ion-ripple-effect></ion-ripple-effect> -->
+                                                            <ion-icon ios="ios-add" md="md-add"></ion-icon>
+                                                        </ion-button>
+                                                    </div>
+                                                </div>
+                                            </ion-col>
+                                            <!-- (+ -) button end -->
+                                            
+                                            <ion-col size-xs="12" size-sm="12" size-md="12"  size-lg="12" style="border: 1px solid #f2f2f2; margin-bottom:10px;">
+                                                <ion-row>
+
+                                                    <!-- icon  -->
+                                                    <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                                      <div>
+                                                          <ion-label position="floating"> Icon</ion-label>
+                                                          <ion-input name="social[{{i}}][icon]" [(ngModel)]="item.icon" clearInput></ion-input>
+                                                      </div>
+                                                    </ion-col> 
+
+                                                    <!-- link  -->
+                                                    <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                                      <div>
+                                                          <ion-label position="floating">Link</ion-label>
+                                                          <ion-input name="social[{{i}}][link]" [(ngModel)]="item.link" clearInput></ion-input>
+                                                      </div>
+                                                    </ion-col> 
+
+                                                    <!-- Order -->
+                                                    <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="4">
+                                                      <div>
+                                                          <ion-label position="floating">Order</ion-label>
+                                                          <ion-input OnlyNumber="true" name="social[{{i}}][order_id]" [(ngModel)]="item.order_id" clearInput></ion-input>
+                                                      </div>
+                                                    </ion-col> 
+
+                                                </ion-row>
+                                            </ion-col>
+                                        </ion-row>
+                                        </ion-grid>
+                                    </div>
+                                </ion-row>
+                            </ion-col>
+                            <!-- multiple social end -->
+
+                        </ion-row>
+                    </ion-grid>
+                </div>
+                <div class="form-button-section">
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col class="ion-text-center" size-xs="12" size-sm="12" size-md="12"  size-lg="12">
+                                <ion-button color="danger" size="default" tooltip="Reload" (click)="reloadPageAlert()">
+                                    Reload
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save')" color="secondary" size="default"
+                                type="submit" [disabled]="!addForm.valid" 
+                                color="secondary" tooltip="Save" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">{{form_submit_text_save}}</span>
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save-add-another')" color="secondary" size="default"
+                                    type="submit" [disabled]="!addForm.valid" 
+                                    color="secondary" tooltip="Save & Add Another" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save_another == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">
+                                        <span class="submitText">{{form_submit_text_save_another}}</span>
+                                    </span>
+                                </ion-button>
+                                <ion-button size="default" fill="clear" color="danger" tooltip="Cancel" flow="up" [routerLink]="['/', 'site']">
+                                    <ion-icon name="close"></ion-icon>
+                                    Cancel
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </div>
+            </form>
+        </div>
+    </div>
+</ion-content>
+
+<!-- common footer show -->
+<common-footer></common-footer>

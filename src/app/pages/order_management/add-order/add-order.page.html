@@ -1,0 +1,185 @@
+<!-- common header show -->
+<common-header></common-header>
+ 
+<ion-content class="page-wrapper">
+    <div class="page-inner">
+        <ion-row class="width-100 sub-header nomargin nopadding">
+            <ion-col size-xs="7" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color pull-left width-100 font-size-18 vertical-middle">
+                    <span>{{actionHeaderText}} Order</span>
+                </div>
+            </ion-col>
+            <ion-col size-xs="5" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+                <div class = "sub-header-color width-100 text-right">
+                <span class="font-size-13"> {{curentDate | date:'dd MMM yyy'}} <i>|</i> {{curentDate | date:'h:mm a '}}</span>
+                </div>
+            </ion-col>
+        </ion-row> 
+        <div class="add-new-page-body" [ngClass]="{'disabled': form_submit_text == 'Submitting'}">
+
+            <!-- loading -->
+            <div class="edit-loading-page" *ngIf="editLoading">
+                <span>
+                    <ion-spinner name="lines"></ion-spinner>
+                </span>
+            </div>
+
+            <form  #addForm="ngForm" (ngSubmit)="onSubmit(addForm)" >
+                <div class="add-new-page-under">
+                    <ion-grid>
+                        <ion-row>
+
+                            <!-- for edit -->
+                            <input *ngIf="actionHeaderText == 'Edit'" type="hidden" name="_method" [(ngModel)]="onEditField">
+
+                            <!-- User -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <div>
+                                    <ion-label position="floating">User<sup>*</sup></ion-label>
+                                    <ng-select  #userNameSerch
+                                    [loading]="selectLoading"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select User"
+                                    [items]="userList"
+                                    bindLabel="name"
+                                    name="user_id"
+                                    bindValue="id"
+                                    [searchable]="false"
+                                    [(ngModel)]="model.user_id"
+                                    required
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="userNameSerch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                    </ng-select>
+                                </div>
+                            </ion-col>
+
+                            <!-- Type -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                              <ion-label position="floating"> Type<sup>*</sup> </ion-label>
+                              <ng-select #TypeSerch
+                                  [loading]="selectLoading"
+                                  [dropdownPosition]="'bottom'"
+                                  placeholder="Please Select Type"
+                                  [items]="typeList"
+                                  bindLabel="name"
+                                  name="identifier"
+                                  bindValue="value"
+                                  [searchable]="false"
+                                  [(ngModel)]="model.identifier"
+                                  required
+                                  >
+                                  <ng-template ng-header-tmp>
+                                      <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="TypeSerch.filter($event.target.value)" [autofocus]="true" />
+                                  </ng-template>
+                              </ng-select>
+                            </ion-col>
+
+                            <!-- Duration in month -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                                <ion-label position="floating"> Duration</ion-label>
+                                <ng-select #durationSearch
+                                    [loading]="selectLoadingDepend"
+                                    [dropdownPosition]="'bottom'"
+                                    placeholder="Please Select Duration"
+                                    [items]="durationList"
+                                    bindLabel="name"
+                                    bindValue="value"
+                                    [searchable]="false"
+                                    name="duration" 
+                                    [(ngModel)]="model.duration"
+                                    >
+                                    <ng-template ng-header-tmp>
+                                        <input placeholder="Search" class="dropdown-custom-search" type="text" (input)="durationSearch.filter($event.target.value)" [autofocus]="true" />
+                                    </ng-template>
+                                </ng-select>
+                                <ion-label position="floating"> (Choose only Half yearly or Annually for Voluntership)</ion-label>
+                            </ion-col>
+
+                            <!-- Price -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                              <div>
+                                <ion-label position="floating">Price<sup>*</sup></ion-label>
+                                <ion-input name="price" OnlyNumber="true" [(ngModel)]="model.price" required clearInput 
+                                ></ion-input>
+                              </div>
+                            </ion-col>
+
+                            <!-- Start Date -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                              <div>
+                                <ion-label position="floating">Start Date</ion-label>
+                                <li-ionic4-datepicker 
+                                name="start_date" 
+                                [(ngModel)]="model.start_date"
+                                [inputDateConfig]="startdatePickerObj" 
+                                (ngModelChange)="onDateChangeStartDate(model.start_date)"
+                                >
+                                </li-ionic4-datepicker>
+                              </div>
+                            </ion-col>
+
+                            <!-- End Date -->
+                            <ion-col size-xs="12" size-sm="6" size-md="4"  size-lg="3">
+                              <div>
+                                <ion-label position="floating">End Date</ion-label>
+                                <li-ionic4-datepicker 
+                                  name="end_date" 
+                                  [(ngModel)]="model.end_date"
+                                  [inputDateConfig]="endDatePickerObj" 
+                                  (ngModelChange)="onDateChangeEndDate(model.end_date)"
+                                  >
+                                </li-ionic4-datepicker>
+                              </div>
+                            </ion-col>
+
+                            <!-- Enable Button -->
+                            <ion-col size-xs="6" size-sm="6" size-md="3"  size-lg="2">
+                                <div class="toggle-button">
+                                    <ion-label>Enable</ion-label>
+                                    <ion-label>
+                                        <p class="onoff"><input type="checkbox" value="1" id="checkboxID" name="status" [(ngModel)]="model.enable"><label for="checkboxID"></label></p>
+                                    </ion-label>
+                                </div>
+                            </ion-col>
+                            
+                        </ion-row>
+                    </ion-grid>
+                </div>
+                <div class="form-button-section">
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col class="ion-text-center" size-xs="12" size-sm="12" size-md="12"  size-lg="12">
+                                <ion-button color="danger" size="default" tooltip="Reload" (click)="reloadPageAlert()">
+                                    Reload
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save')" color="secondary" size="default"
+                                type="submit" [disabled]="!addForm.valid" 
+                                color="secondary" tooltip="Save" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">{{form_submit_text_save}}</span>
+                                </ion-button>
+                                <ion-button (click)="clickButtonType('Save-add-another')" color="secondary" size="default"
+                                    type="submit" [disabled]="!addForm.valid" 
+                                    color="secondary" tooltip="Save & Add Another" flow="up">
+                                    <ion-spinner *ngIf="form_submit_text_save_another == 'Submitting'" name="crescent"></ion-spinner> 
+                                    <span class="submitText">
+                                        <span class="submitText">{{form_submit_text_save_another}}</span>
+                                    </span>
+                                </ion-button>
+                                <ion-button size="default" fill="clear" color="danger" tooltip="Cancel" flow="up" [routerLink]="['/', 'order']">
+                                    <ion-icon name="close"></ion-icon>
+                                    Cancel
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </div>
+            </form>
+        </div>
+    </div>
+</ion-content>
+
+<!-- common footer show -->
+<common-footer></common-footer>

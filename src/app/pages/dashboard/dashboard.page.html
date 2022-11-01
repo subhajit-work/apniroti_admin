@@ -1,0 +1,72 @@
+<!-- common header show -->
+<common-header></common-header>
+
+<ion-content class="page-wrapper">
+  <div style="display: flow-root" class="page-inner">
+    <!-- ------------ sub Header Start ----------------->
+    <ion-row class="sub-header width-100 pull-left nomargin nopadding">
+      <ion-col size-xs="7" size-sm="6" class = "sub-header-item pull-left width-100 padding-10">
+        <div class = "sub-header-color pull-left width-100 font-size-18 vertical-middle">
+          <span>Dashboard</span>
+        </div>
+      </ion-col>
+      <ion-col size-xs="5" size-sm="6" class = "transaction-inner pull-left width-100 padding-10">
+        <div class = "sub-header-color width-100 text-right">
+          <span class="font-size-13"> {{curentDate | date:'dd MMM yyy'}} <i>|</i> {{curentDate | date:'h:mm a '}}</span>
+        </div>
+      </ion-col>
+    </ion-row>
+    <!-- ------------ sub Header End ----------------->
+  
+    <div class="pull-left width-100">
+      <ion-grid >
+        <ion-row>
+          <ion-col size="12">
+            <!-- loading -->
+            <div class="edit-loading-page" style="margin-bottom: 20px;">
+              <span>
+                <!-- Dashboard -->
+              </span>
+            </div>
+
+            <!-- chart start -->
+            <div class="dashboard-chart-wrapper">
+              <div class="dashboard-chart">
+                <kendo-chart [seriesColors]="dashboardDataChartColor">
+                  <kendo-chart-series>
+                    <kendo-chart-series-item
+                        type="donut" [data]="dashboardData?.dashboard" 
+                        categoryField="name" field="value">
+                      <kendo-chart-series-item-labels [rotation]="45"
+                        color="#fff" background="none" >
+                      </kendo-chart-series-item-labels>
+                    </kendo-chart-series-item>
+                  </kendo-chart-series>
+                  <kendo-chart-legend [visible]="true" ></kendo-chart-legend>
+                </kendo-chart>
+                </div>
+                
+                <div class="desboard-counts">
+                  <div class="desboard-count-item" *ngFor="let item of dashboardData?.dashboard">
+                    <div class="count-text"  [ngStyle]="{'background-color':item.color}">
+                      {{item?.name}}
+                    </div>
+                    <div class="count-value" >
+                      {{item?.value}}
+                    </div>
+                  </div>
+                </div>
+                
+            </div>
+            <!-- chart end -->
+
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
+
+</ion-content>
+
+<!-- common footer show -->
+<common-footer></common-footer>
